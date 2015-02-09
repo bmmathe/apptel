@@ -22,37 +22,46 @@ namespace AppTel.WinService.Controllers
             {
                 var groupMatcher = GroupMatcher<JobKey>.GroupContains(group);
                 var jobKeys = scheduler.GetJobKeys(groupMatcher);
-                foreach (var jobKey in jobKeys)
-                {
-                    var job = new JobModel();                    
-                    var detail = scheduler.GetJobDetail(jobKey);
-                    job.ApplicationName = detail.JobDataMap.GetString("ApplicationName");
-                    job.Endpoint = detail.JobDataMap.GetString("Endpoint");
-                    job.JobName = detail.Key.Name;
-                    var trigger = scheduler.GetTriggersOfJob(jobKey).First();                    
-                    job.TriggerName = trigger.Key.Name;
-
-                    var simpleTrigger = trigger as ISimpleTrigger;
-                    if (simpleTrigger != null)
-                    {
-                        job.RepeatIntervalInSeconds = simpleTrigger.RepeatInterval.Seconds;
-                    }
-
-                    DateTimeOffset? nextFireTime = trigger.GetNextFireTimeUtc();
-                    if (nextFireTime.HasValue)
-                    {
-                        job.NextFireTime = nextFireTime.Value.LocalDateTime.ToString();
-                    }
-
-                    DateTimeOffset? previousFireTime = trigger.GetPreviousFireTimeUtc();
-                    if (previousFireTime.HasValue)
-                    {
-                        job.PreviousFireTime = previousFireTime.Value.LocalDateTime.ToString();
-                    }
-                    jobs.Add(job);
-                }
+                jobs.AddRange(jobKeys.Select(GetJobDetails));
             }
             return jobs.ToArray();
+        }
+
+        public JobModel Get(string jobName)
+        {
+            return GetJobDetails(new JobKey(jobName));
+        }
+
+        private JobModel GetJobDetails(JobKey jobKey)
+        {
+            var job = new JobModel();
+            var scheduler = new StdSchedulerFactory().GetScheduler();
+            var detail = scheduler.GetJobDetail(jobKey);
+            job.ApplicationName = detail.JobDataMap.GetString("ApplicationName");
+            job.Endpoint = detail.JobDataMap.GetString("Endpoint");
+            job.JobName = detail.Key.Name;
+            var trigger = scheduler.GetTriggersOfJob(jobKey).First();
+            job.TriggerName = trigger.Key.Name;
+
+            var simpleTrigger = trigger as ISimpleTrigger;
+            if (simpleTrigger != null)
+            {
+                job.RepeatIntervalInSeconds = simpleTrigger.RepeatInterval.Seconds;
+            }
+
+            DateTimeOffset? nextFireTime = trigger.GetNextFireTimeUtc();
+            if (nextFireTime.HasValue)
+            {
+                job.NextFireTime = nextFireTime.Value.LocalDateTime.ToString();
+            }
+
+            DateTimeOffset? previousFireTime = trigger.GetPreviousFireTimeUtc();
+            if (previousFireTime.HasValue)
+            {
+                job.PreviousFireTime = previousFireTime.Value.LocalDateTime.ToString();
+            }
+
+            return job;
         }
 
         public void Post([FromBody] JobModel model)
@@ -67,12 +76,28 @@ namespace AppTel.WinService.Controllers
                 .WithIdentity(string.Format("trigger_{0}", model.ApplicationName), "group1")
                 .StartNow()
                 .WithSimpleSchedule(x => x
-                    .WithIntervalInSeconds(5)
+                    .WithIntervalInSeconds(model.RepeatIntervalInSeconds)
                     .RepeatForever())
                 .Build();
 
             var schedule = new StdSchedulerFactory().GetScheduler();
             schedule.ScheduleJob(job, trigger);
+        }
+
+        public void Put([FromBody] JobModel model)
+        {
+            var scheduler = new StdSchedulerFactory().GetScheduler();
+            var job  = scheduler.GetJobDetail(new JobKey(model.JobName));
+            var trigger = scheduler.GetTrigger(new TriggerKey(model.TriggerName));
+            var builder = trigger.GetTriggerBuilder();
+            var newTrigger = builder.WithSimpleSchedule(x => x.WithIntervalInSeconds(model.RepeatIntervalInSeconds).RepeatForever()).Build();
+            scheduler.RescheduleJob(trigger.Key, newTrigger);
+            if(model.IsPaused)
+                scheduler.PauseJob(job.Key);
+            else
+            {
+                scheduler.ResumeJob(job.Key);                
+            }
         }
     }
 }

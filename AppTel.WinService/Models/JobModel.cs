@@ -9,5 +9,6 @@
         public int RepeatIntervalInSeconds { get; set; }
         public string NextFireTime { get; set; }
         public string PreviousFireTime { get; set; }
+        public bool IsPaused { get; set; }
     }
 }
