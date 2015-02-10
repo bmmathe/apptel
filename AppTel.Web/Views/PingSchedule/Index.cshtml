@@ -3,12 +3,18 @@
     ViewBag.Title = "Ping Schedule";
 }
 @section scripts{
-    
+    <script>
+        $(document).ready(function() {
+            $("#ScheduleTable > tbody > tr > td > a[data-type='pause']").on("click", function () {
+                console.log($(this).data("job"));
+            });            
+        });
+    </script>
 }
 <h2>Ping Schedule</h2>
 @Html.ActionLink("Create Job", "Create", "PingSchedule", null, new {@class="btn btn-primary"})
 
-<table class="table table-striped table-hover">
+<table id="ScheduleTable" class="table table-striped table-hover">
     <thead>
         <tr>
             <th>
@@ -19,6 +25,9 @@
             </th>
             <th>
                 Interval (in seconds)
+            </th>
+            <th>
+                
             </th>
         </tr>
     </thead>
@@ -34,6 +43,9 @@
                 </td>
                 <td>
                     @job.RepeatIntervalInSeconds.ToString()
+                </td>
+                <td>
+                    <a href="#" class="btn btn-sm btn-primary" data-type="pause" data-job="@job.JobName">Pause</a>
                 </td>
             </tr>
         }

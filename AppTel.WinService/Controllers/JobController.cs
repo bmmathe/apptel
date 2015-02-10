@@ -48,7 +48,7 @@ namespace AppTel.WinService.Controllers
             {
                 job.RepeatIntervalInSeconds = simpleTrigger.RepeatInterval.Seconds;
             }
-
+            
             DateTimeOffset? nextFireTime = trigger.GetNextFireTimeUtc();
             if (nextFireTime.HasValue)
             {
@@ -60,6 +60,9 @@ namespace AppTel.WinService.Controllers
             {
                 job.PreviousFireTime = previousFireTime.Value.LocalDateTime.ToString();
             }
+
+            var triggerState = scheduler.GetTriggerState(trigger.Key);            
+            job.TriggerState = triggerState.ToString();
 
             return job;
         }
@@ -91,13 +94,25 @@ namespace AppTel.WinService.Controllers
             var trigger = scheduler.GetTrigger(new TriggerKey(model.TriggerName));
             var builder = trigger.GetTriggerBuilder();
             var newTrigger = builder.WithSimpleSchedule(x => x.WithIntervalInSeconds(model.RepeatIntervalInSeconds).RepeatForever()).Build();
-            scheduler.RescheduleJob(trigger.Key, newTrigger);
-            if(model.IsPaused)
-                scheduler.PauseJob(job.Key);
-            else
-            {
-                scheduler.ResumeJob(job.Key);                
-            }
+            scheduler.RescheduleJob(trigger.Key, newTrigger);            
+        }
+
+        [HttpPost]
+        public IHttpActionResult PauseJob(string jobName)
+        {
+            var scheduler = new StdSchedulerFactory().GetScheduler();
+            var job = scheduler.GetJobDetail(new JobKey(jobName));
+            scheduler.PauseJob(job.Key);
+            return Ok();
+        }
+
+        [HttpPost]
+        public IHttpActionResult ResumeJob(string jobName)
+        {
+            var scheduler = new StdSchedulerFactory().GetScheduler();
+            var job = scheduler.GetJobDetail(new JobKey(jobName));
+            scheduler.PauseJob(job.Key);
+            return Ok();
         }
     }
 }

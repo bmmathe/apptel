@@ -11,14 +11,15 @@ namespace AppTel.Web.Models
         [DisplayName("Endpoint")]
         [Required]
         public string Endpoint { get; set; }
-        [DisplayName("JobName")]
+        [DisplayName("Job Name")]
         public string JobName { get; set; }
         public string TriggerName { get; set; }
         [DisplayName("Interval (in seconds)")]
         [Required]            
         public int RepeatIntervalInSeconds { get; set; }
         public string NextFireTime { get; set; }
-        public string PreviousFireTime { get; set; }
-        public bool IsPaused { get; set; }
+        public string PreviousFireTime { get; set; }        
+        [DisplayName("Trigger State")]
+        public string TriggerState { get; set; }
     }
 }
