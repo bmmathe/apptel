@@ -22,7 +22,7 @@ namespace AppTel.Web.Controllers
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 var response = await client.GetAsync("api/Job");
                 var jobs = await response.Content.ReadAsAsync<List<JobModel>>();
-                return View(new PingScheduleViewModel{Jobs = jobs});
+                return View(new PingScheduleViewModel { Jobs = jobs, AppTelServiceBaseURL = ConfigurationManager.AppSettings["AppTelServiceBaseURL"] });
             }
         }
 

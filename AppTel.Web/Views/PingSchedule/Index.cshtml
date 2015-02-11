@@ -4,11 +4,32 @@
 }
 @section scripts{
     <script>
-        $(document).ready(function() {
-            $("#ScheduleTable > tbody > tr > td > a[data-type='pause']").on("click", function () {
-                console.log($(this).data("job"));
-            });            
+    $(document).ready(function () {
+        $("#ScheduleTable > tbody > tr > td > a").on("click", function () {
+            var actiontype = $(this).data("type");
+            if (actiontype === "pause") {
+                var pauseEndpoint = '@Model.AppTelServiceBaseURL' + 'api/Job/pause/' + $(this).data("job");
+                $.ajax({
+                    url: pauseEndpoint,
+                    type: 'POST',
+                    context: this,
+                    success: function() {
+                        $(this).text("Resume");
+                    }
+                });                
+            }
+            else if (actiontype === "delete") {
+                var deleteEndpoint = '@Model.AppTelServiceBaseURL' + 'api/Job/' + $(this).data("job");
+                $.ajax({
+                    url: deleteEndpoint,
+                    type: 'DELETE',
+                    success: function() {
+                        location.reload(true);
+                    }                        
+                });                   
+            }
         });
+    });
     </script>
 }
 <h2>Ping Schedule</h2>
@@ -25,6 +46,12 @@
             </th>
             <th>
                 Interval (in seconds)
+            </th>
+            <th>
+                Job State
+            </th>
+            <th>
+                
             </th>
             <th>
                 
@@ -44,8 +71,12 @@
                 <td>
                     @job.RepeatIntervalInSeconds.ToString()
                 </td>
+                <td>@job.TriggerState</td>
                 <td>
-                    <a href="#" class="btn btn-sm btn-primary" data-type="pause" data-job="@job.JobName">Pause</a>
+                    <a href="#" class="btn btn-sm btn-primary" data-type="pause" data-job="@job.JobName" id="pause_@job.JobName">Pause</a>
+                </td>
+                <td>
+                    <a href="#" class="btn btn-sm btn-danger" data-type="delete" data-job="@job.JobName" id="delete_@job.JobName">Delete</a>
                 </td>
             </tr>
         }

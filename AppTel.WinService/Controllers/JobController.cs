@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
+using System.Web.Http.Results;
 using AppTel.WinService.Jobs;
 using AppTel.WinService.Models;
 using Quartz;
@@ -96,22 +97,36 @@ namespace AppTel.WinService.Controllers
             var newTrigger = builder.WithSimpleSchedule(x => x.WithIntervalInSeconds(model.RepeatIntervalInSeconds).RepeatForever()).Build();
             scheduler.RescheduleJob(trigger.Key, newTrigger);            
         }
-
-        [HttpPost]
-        public IHttpActionResult PauseJob(string jobName)
+        
+        public IHttpActionResult Delete(string jobName)
         {
-            var scheduler = new StdSchedulerFactory().GetScheduler();
-            var job = scheduler.GetJobDetail(new JobKey(jobName));
-            scheduler.PauseJob(job.Key);
+            try
+            {
+                var scheduler = new StdSchedulerFactory().GetScheduler();
+                scheduler.DeleteJob(new JobKey(jobName));
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
             return Ok();
         }
 
         [HttpPost]
+        [Route("api/Job/pause/{jobName}")]
+        public IHttpActionResult PauseJob(string jobName)
+        {
+            var scheduler = new StdSchedulerFactory().GetScheduler();
+            scheduler.PauseJob(new JobKey(jobName));
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("api/Job/resume/{jobName}")]
         public IHttpActionResult ResumeJob(string jobName)
         {
             var scheduler = new StdSchedulerFactory().GetScheduler();
-            var job = scheduler.GetJobDetail(new JobKey(jobName));
-            scheduler.PauseJob(job.Key);
+            scheduler.ResumeJob(new JobKey(jobName));
             return Ok();
         }
     }
