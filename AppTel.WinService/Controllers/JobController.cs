@@ -11,10 +11,8 @@ using Quartz.Impl.Matchers;
 
 namespace AppTel.WinService.Controllers
 {
-    [RoutePrefix("api/Job")]
     public class JobController : ApiController
     {
-        [HttpGet]
         public JobModel[] Get()
         {
             var jobs = new List<JobModel>();
@@ -30,11 +28,9 @@ namespace AppTel.WinService.Controllers
             return jobs.ToArray();
         }
 
-        [HttpGet]
-        [Route("{jobName}")]
-        public JobModel Get(string jobName)
+        public JobModel Get(string id)
         {
-            return GetJobDetails(new JobKey(jobName, "group1"));
+            return GetJobDetails(new JobKey(id, "group1"));
         }
 
         private JobModel GetJobDetails(JobKey jobKey)
@@ -96,19 +92,20 @@ namespace AppTel.WinService.Controllers
         {
             var scheduler = new StdSchedulerFactory().GetScheduler();
             var job  = scheduler.GetJobDetail(new JobKey(model.JobName));
+            job.JobDataMap["ApplicationName"] = model.ApplicationName;
+            job.JobDataMap["Endpoint"] = model.Endpoint;
             var trigger = scheduler.GetTrigger(new TriggerKey(model.TriggerName));
             var builder = trigger.GetTriggerBuilder();
             var newTrigger = builder.WithSimpleSchedule(x => x.WithIntervalInSeconds(model.RepeatIntervalInSeconds).RepeatForever()).Build();
             scheduler.RescheduleJob(trigger.Key, newTrigger);            
         }
         
-        [Route("{jobName}")]
-        public IHttpActionResult Delete(string jobName)
+        public IHttpActionResult Delete(string id)
         {
             try
             {
                 var scheduler = new StdSchedulerFactory().GetScheduler();
-                scheduler.DeleteJob(new JobKey(jobName, "group1"));
+                scheduler.DeleteJob(new JobKey(id, "group1"));
             }
             catch (Exception ex)
             {
@@ -118,20 +115,20 @@ namespace AppTel.WinService.Controllers
         }
 
         [HttpPost]
-        [Route("api/Job/pause/{jobName}")]
-        public IHttpActionResult PauseJob(string jobName)
+        [Route("api/Job/pause/{id}")]
+        public IHttpActionResult PauseJob(string id)
         {
-            var scheduler = new StdSchedulerFactory().GetScheduler();
-            scheduler.PauseJob(new JobKey(jobName, "group1"));
+            var scheduler = new StdSchedulerFactory().GetScheduler();                        
+            scheduler.PauseJob(new JobKey(id, "group1"));
             return Ok();
         }
 
         [HttpPost]
-        [Route("api/Job/resume/{jobName}")]
-        public IHttpActionResult ResumeJob(string jobName)
+        [Route("api/Job/resume/{id}")]
+        public IHttpActionResult ResumeJob(string id)
         {
             var scheduler = new StdSchedulerFactory().GetScheduler();
-            scheduler.ResumeJob(new JobKey(jobName, "group1"));
+            scheduler.ResumeJob(new JobKey(id, "group1"));
             return Ok();
         }
     }
