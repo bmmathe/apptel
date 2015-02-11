@@ -11,8 +11,10 @@ using Quartz.Impl.Matchers;
 
 namespace AppTel.WinService.Controllers
 {
+    [RoutePrefix("api/Job")]
     public class JobController : ApiController
     {
+        [HttpGet]
         public JobModel[] Get()
         {
             var jobs = new List<JobModel>();
@@ -28,9 +30,11 @@ namespace AppTel.WinService.Controllers
             return jobs.ToArray();
         }
 
+        [HttpGet]
+        [Route("{jobName}")]
         public JobModel Get(string jobName)
         {
-            return GetJobDetails(new JobKey(jobName));
+            return GetJobDetails(new JobKey(jobName, "group1"));
         }
 
         private JobModel GetJobDetails(JobKey jobKey)
@@ -98,12 +102,13 @@ namespace AppTel.WinService.Controllers
             scheduler.RescheduleJob(trigger.Key, newTrigger);            
         }
         
+        [Route("{jobName}")]
         public IHttpActionResult Delete(string jobName)
         {
             try
             {
                 var scheduler = new StdSchedulerFactory().GetScheduler();
-                scheduler.DeleteJob(new JobKey(jobName));
+                scheduler.DeleteJob(new JobKey(jobName, "group1"));
             }
             catch (Exception ex)
             {
@@ -117,7 +122,7 @@ namespace AppTel.WinService.Controllers
         public IHttpActionResult PauseJob(string jobName)
         {
             var scheduler = new StdSchedulerFactory().GetScheduler();
-            scheduler.PauseJob(new JobKey(jobName));
+            scheduler.PauseJob(new JobKey(jobName, "group1"));
             return Ok();
         }
 
@@ -126,7 +131,7 @@ namespace AppTel.WinService.Controllers
         public IHttpActionResult ResumeJob(string jobName)
         {
             var scheduler = new StdSchedulerFactory().GetScheduler();
-            scheduler.ResumeJob(new JobKey(jobName));
+            scheduler.ResumeJob(new JobKey(jobName, "group1"));
             return Ok();
         }
     }
