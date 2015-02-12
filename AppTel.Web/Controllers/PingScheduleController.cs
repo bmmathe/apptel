@@ -15,6 +15,12 @@ namespace AppTel.Web.Controllers
     {
         public async Task<ActionResult> Index()
         {
+            var viewModel = await GetPingScheduleViewModel();            
+            return View(viewModel);
+        }
+
+        private async Task<PingScheduleViewModel> GetPingScheduleViewModel()
+        {
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(ConfigurationManager.AppSettings["AppTelServiceBaseURL"]);
@@ -22,7 +28,8 @@ namespace AppTel.Web.Controllers
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 var response = await client.GetAsync("api/Job");
                 var jobs = await response.Content.ReadAsAsync<List<JobModel>>();
-                return View(new PingScheduleViewModel { Jobs = jobs, AppTelServiceBaseURL = ConfigurationManager.AppSettings["AppTelServiceBaseURL"] });
+                var viewModel = new PingScheduleViewModel {Jobs = jobs, AppTelServiceBaseURL = ConfigurationManager.AppSettings["AppTelServiceBaseURL"]};
+                return viewModel;
             }
         }
 
@@ -42,6 +49,45 @@ namespace AppTel.Web.Controllers
                 await client.PostAsJsonAsync("api/Job", model).ContinueWith(posttask => posttask.Result.EnsureSuccessStatusCode());                
             }
             return RedirectToAction("Index");
+        }
+
+        public async Task<ActionResult> Delete(string id)
+        {
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(ConfigurationManager.AppSettings["AppTelServiceBaseURL"]);
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                await client.DeleteAsync(string.Format("api/Job/{0}", id)).ContinueWith(posttask => posttask.Result.EnsureSuccessStatusCode());
+            }
+            var viewModel = await GetPingScheduleViewModel();
+            return PartialView("_ScheduleTable", viewModel);
+        }
+
+        public async Task<ActionResult> Pause(string id)
+        {
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(ConfigurationManager.AppSettings["AppTelServiceBaseURL"]);
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                await client.PostAsync(string.Format("api/Job/Pause/{0}", id), null).ContinueWith(posttask => posttask.Result.EnsureSuccessStatusCode());
+            }
+            var viewModel = await GetPingScheduleViewModel();
+            return PartialView("_ScheduleTable", viewModel);
+        }
+
+        public async Task<ActionResult> Resume(string id)
+        {
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(ConfigurationManager.AppSettings["AppTelServiceBaseURL"]);
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                await client.PostAsync(string.Format("api/Job/Resume/{0}", id), null).ContinueWith(posttask => posttask.Result.EnsureSuccessStatusCode());
+            }
+            var viewModel = await GetPingScheduleViewModel();
+            return PartialView("_ScheduleTable", viewModel);
         }
     }    
 }

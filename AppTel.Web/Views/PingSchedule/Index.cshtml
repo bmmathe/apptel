@@ -2,83 +2,8 @@
 @{
     ViewBag.Title = "Ping Schedule";
 }
-@section scripts{
-    <script>
-    $(document).ready(function () {
-        $("#ScheduleTable > tbody > tr > td > a").on("click", function () {
-            var actiontype = $(this).data("type");
-            if (actiontype === "pause") {
-                var pauseEndpoint = '@Model.AppTelServiceBaseURL' + 'api/Job/pause/' + $(this).data("job");
-                $.ajax({
-                    url: pauseEndpoint,
-                    type: 'POST',
-                    context: this,
-                    success: function() {
-                        $(this).text("Resume");
-                    }
-                });                
-            }
-            else if (actiontype === "delete") {
-                var deleteEndpoint = '@Model.AppTelServiceBaseURL' + 'api/Job/' + $(this).data("job");
-                $.ajax({
-                    url: deleteEndpoint,
-                    type: 'DELETE',
-                    success: function() {
-                        location.reload(true);
-                    }                        
-                });                   
-            }
-        });
-    });
-    </script>
-}
 <h2>Ping Schedule</h2>
 @Html.ActionLink("Create Job", "Create", "PingSchedule", null, new {@class="btn btn-primary"})
-
-<table id="ScheduleTable" class="table table-striped table-hover">
-    <thead>
-        <tr>
-            <th>
-                Application Name
-            </th> 
-            <th>
-                Endpoint
-            </th>
-            <th>
-                Interval (in seconds)
-            </th>
-            <th>
-                Job State
-            </th>
-            <th>
-                
-            </th>
-            <th>
-                
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var job in Model.Jobs)
-        {
-            <tr>
-                <td>
-                    @job.ApplicationName
-                </td>
-                <td>
-                    @job.Endpoint
-                </td>
-                <td>
-                    @job.RepeatIntervalInSeconds.ToString()
-                </td>
-                <td>@job.TriggerState</td>
-                <td>
-                    <a href="#" class="btn btn-sm btn-primary" data-type="pause" data-job="@job.JobName" id="pause_@job.JobName">Pause</a>
-                </td>
-                <td>
-                    <a href="#" class="btn btn-sm btn-danger" data-type="delete" data-job="@job.JobName" id="delete_@job.JobName">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div id="schedule">
+    @Html.Partial("_ScheduleTable", Model)
+</div>

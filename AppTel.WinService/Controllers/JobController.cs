@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
-using System.Web.Http.Results;
 using AppTel.WinService.Jobs;
 using AppTel.WinService.Models;
 using Quartz;
@@ -118,23 +117,8 @@ namespace AppTel.WinService.Controllers
         [Route("api/Job/pause/{id}")]
         public IHttpActionResult PauseJob(string id)
         {
-            var scheduler = new StdSchedulerFactory().GetScheduler();
-            IList<string> jobGroups = scheduler.GetJobGroupNames();
-
-            foreach (string group in jobGroups)
-            {
-                var groupMatcher = GroupMatcher<JobKey>.GroupContains(group);
-                var jobKeys = scheduler.GetJobKeys(groupMatcher);
-                foreach (var jobKey in jobKeys)
-                {
-                    if (jobKey.Name == id)
-                    {
-                        scheduler.PauseJob(jobKey);
-                        break;
-                    }
-                }
-            }
-            //scheduler.PauseJob(new JobKey(id, "group1"));
+            var scheduler = new StdSchedulerFactory().GetScheduler();            
+            scheduler.PauseJob(new JobKey(id, "group1"));
             return Ok();
         }
 
@@ -142,23 +126,8 @@ namespace AppTel.WinService.Controllers
         [Route("api/Job/resume/{id}")]
         public IHttpActionResult ResumeJob(string id)
         {
-            var scheduler = new StdSchedulerFactory().GetScheduler();
-            IList<string> jobGroups = scheduler.GetJobGroupNames();
-
-            foreach (string group in jobGroups)
-            {
-                var groupMatcher = GroupMatcher<JobKey>.GroupContains(group);
-                var jobKeys = scheduler.GetJobKeys(groupMatcher);
-                foreach (var jobKey in jobKeys)
-                {
-                    if (jobKey.Name == id)
-                    {
-                        scheduler.ResumeJob(jobKey);
-                        break;
-                    }
-                }
-            }
-            //scheduler.ResumeJob(new JobKey(id, "group1"));
+            var scheduler = new StdSchedulerFactory().GetScheduler();            
+            scheduler.ResumeJob(new JobKey(id, "group1"));
             return Ok();
         }
     }
