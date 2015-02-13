@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -19,5 +20,6 @@ namespace AppTel.Domain.Data
         public int PulsesPerHour { get; set; }
         public List<AppPing> Pings { get; set; }
         public List<Pulse> Pulses { get; set; }
+        public List<AppError> Exceptions { get; set; } 
     }
 }

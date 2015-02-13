@@ -11,5 +11,4 @@ namespace AppTel.Domain.Data
         public bool IsSuccess { get; set; }
         public string Error { get; set; }        
     }
- 
 }

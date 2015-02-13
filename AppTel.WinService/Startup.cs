@@ -14,9 +14,12 @@ namespace AppTel.WinService
             // Configure Web API for self-host. 
             var config = new HttpConfiguration();
             appBuilder.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
+
             var container = new UnityContainer();
             container.RegisterType<IPulseService, PulseService>(new HierarchicalLifetimeManager());
             container.RegisterType<IPingService, PingService>(new HierarchicalLifetimeManager());
+            container.RegisterType<IErrorService, ErrorService>(new HierarchicalLifetimeManager());
+
             config.DependencyResolver = new UnityResolver(container);
             config.MapHttpAttributeRoutes();
             config.Routes.MapHttpRoute(
