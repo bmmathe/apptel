@@ -14,7 +14,7 @@ namespace AppTel.WinService.Controllers
         }
 
         [HttpPost]
-        public void Create([FromBody] AppError error)
+        public void Create([FromBody] AppErrorModel error)
         {
             _errorService.LogError(error.ApplicationName, error.Exception);
         }

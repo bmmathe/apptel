@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -12,6 +11,7 @@ namespace AppTel.Domain.Data
         {
             Pings = new List<AppPing>();
             Pulses = new List<Pulse>();
+            Exceptions = new List<AppError>();
         }
 
         public ObjectId Id { get; set; }

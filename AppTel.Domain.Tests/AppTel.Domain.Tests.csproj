@@ -59,8 +59,10 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="MongoTests.cs" />
+    <Compile Include="ErrorServiceTests.cs" />
+    <Compile Include="PingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PulseTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AppTel.Domain\AppTel.Domain.csproj">

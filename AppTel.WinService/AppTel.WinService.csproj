@@ -108,12 +108,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\AppMetricsController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\JobController.cs" />
     <Compile Include="Controllers\PulseController.cs" />
     <Compile Include="Jobs\PingJob.cs" />
-    <Compile Include="Models\AppError.cs" />
+    <Compile Include="Models\AppErrorModel.cs" />
+    <Compile Include="Models\AppMetricsModel.cs" />
     <Compile Include="Models\JobModel.cs" />
+    <Compile Include="Models\PingModel.cs" />
     <Compile Include="Models\PulseModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

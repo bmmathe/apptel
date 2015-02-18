@@ -54,7 +54,9 @@
     <Compile Include="Data\AppPing.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Data\Pulse.cs" />
+    <Compile Include="Services\AppMetricsService.cs" />
     <Compile Include="Services\ErrorService.cs" />
+    <Compile Include="Services\IAppMetricsService.cs" />
     <Compile Include="Services\IErrorService.cs" />
     <Compile Include="Services\InitializeAppTelDb.cs" />
     <Compile Include="Services\IPingService.cs" />
