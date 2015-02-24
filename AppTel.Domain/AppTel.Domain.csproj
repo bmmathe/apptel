@@ -52,6 +52,7 @@
     <Compile Include="Data\AppError.cs" />
     <Compile Include="Data\AppMetrics.cs" />
     <Compile Include="Data\AppPing.cs" />
+    <Compile Include="Models\AppMetricsQuickCheckInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Data\Pulse.cs" />
     <Compile Include="Services\AppMetricsService.cs" />
